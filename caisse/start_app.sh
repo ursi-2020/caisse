@@ -41,7 +41,10 @@ python -m application.manage collectstatic --clear --no-input
 
 if [[ "$#" -gt 0 ]] && [[ "$1" == "loadexampledata" ]]
 then
-    python -m application.manage loaddata "${DIR}/fixtures/example.json"
+    fileList=$(find "${DIR}/fixtures/" -name *.json -printf "%f")
+    for file in ${fileList}; do
+        python -m application.manage loaddata "${DIR}/fixtures/${file}"
+    done
 fi
 
 python -m application.manage runserver 0.0.0.0:${WEBSERVER_PORT} &
