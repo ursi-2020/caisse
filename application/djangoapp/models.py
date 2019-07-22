@@ -13,5 +13,8 @@ class Vente(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     date = models.DateTimeField()
 
+class Clik(models.Model):
+    number = models.IntegerField()
+
     def __str__(self):
         return 'Vente: {} - {}'.format(self.article.nom, self.date)
