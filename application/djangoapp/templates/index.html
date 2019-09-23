@@ -5,8 +5,15 @@
     <h1>Caisse App</h1>
 </head>
 <body>
- <form><button class="btn btn-success" formaction="{% url 'test' %}"> Request: gestion magasin</button></form>
+ {% csrf_token %}
+ <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button type="submit"> Mettre à jour la liste des produits </button>
+  </form>
     <p>{{ string }} {{ time }} {{ helloworld }}</p>
-    <p>Vous avez cliqué {{ clique.number }} fois sur le bouton</p>
+    Liste des produits:
+    {% for product in products %}
+    <p> codeProduct: {{ product.name }}, Price: {{  product.price }} €</p>
+    {%  endfor %}
 </body>
 </html>

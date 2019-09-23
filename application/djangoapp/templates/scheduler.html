@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule the products update</title>
+    <h1>Programmer la mise à jour des produits</h1>
+ <form method="post" enctype="multipart/form-data">
+     <p> Choisissez une heure de mise à jour</p>
+    {% csrf_token %}
+    <input type="datetime-local" name="time">
+    <button type="submit">Valider</button>
+  </form>
+
+    Liste des tâches programmées:
+    <p>{{ tasks | safe }}</p>
+
+    <p> {{ request }}</p>
+</head>
+<body>
+
+</body>
+</html>
