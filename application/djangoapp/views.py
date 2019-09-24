@@ -1,15 +1,20 @@
+import requests
 from django.http import HttpResponse
 from apipkg import api_manager as api
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import Article
 from datetime import datetime
 import json
 
 def index(request):
+  #  api.post_request('scheduler', 'app/delete', {"source": "caisse"})
     return HttpResponse("Bienvenue sur l'appli caisse")
 
 def helloworld(request):
     return HttpResponse("Hello,je viens de la caisse")
+
 
 def products_update(request):
 
@@ -36,19 +41,26 @@ def products_update(request):
 
     return render(request, 'index.html', context)
 
+@csrf_exempt
 def scheduler(request):
 
     schedule_result = ""
 
     if request.method == "POST":
         time = (request.POST.get("time") + ":00").replace('-', '/').replace('T', '-')
-        formatted_time = datetime.strptime(time, '%Y/%m/%d-%H:%M:%S')
-        formatted_time_str = datetime.strftime(formatted_time, '%d/%m/%Y-%H:%M:%S')
-        final_time = datetime.strptime(formatted_time_str, '%d/%m/%Y-%H:%M:%S')
-        print(final_time)
-        body = {"target_url": "database_update", "target_app": "caisse", "time": final_time, "recurrence": "day", "name": "products_update"}
+        date = time.split('/')
+        day = date[2].split('-')
+        final_time_str = day[0] + '/' + date[1] + '/' + date[0] + '-' + day[1]
+        final_time = datetime.strptime(final_time_str, '%d/%m/%Y-%H:%M:%S')
+        time_str = final_time.strftime('%d/%m/%Y-%H:%M:%S')
+        print(time_str)
+    #    body = {"target_url": "database_update", "target_app": "caisse", "time": time_str, "recurrence": "day", "data": "",
+     #           "source_app": "caisse", "name": "task1"}
+
+        body = {"target_url": "database_update", "target_app": "caisse", "time": final_time, "recurrence": "day", "data": "", "source_app": "caisse", "name": "random"}
         print(body)
-        schedule_result = api.post_request("scheduler", "schedule/add", body)
+     #   schedule_result = api.post_request("scheduler", "schedule/add", body)
+        schedule_task("caisse", "database_update", final_time, "day", "", "caisse", "update_database2")
 
     tasks = api.send_request("scheduler", "schedule/list")
 
@@ -69,3 +81,12 @@ def database_update():
     for product in json_data["produits"]:
         article = Article(name=product["codeProduit"], price=product["prix"], stock=product["quantiteMin"])
         article.save()
+
+def schedule_task(host, url, time, recurrence, data, source, name):
+    time_str = time.strftime('%d/%m/%Y-%H:%M:%S')
+    headers = {'Host': 'scheduler'}
+    data = {"target_url": url, "target_app": host, "time": time_str, "recurrence": recurrence, "data": data, "source_app": source, "name": name}
+    r = requests.post(api.api_services_url + 'schedule/add', headers = headers, json = data)
+    print(r.status_code)
+    print(r.text)
+    return r.text
