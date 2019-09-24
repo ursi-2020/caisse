@@ -15,7 +15,7 @@ def index(request):
 def helloworld(request):
     return HttpResponse("Hello,je viens de la caisse")
 
-
+@csrf_exempt
 def products_update(request):
 
     helloworld = ''
@@ -26,7 +26,11 @@ def products_update(request):
     if request.method == "POST":
         if 'order' in request.POST and request.FILES['file']:
             json_data = json.loads(request.FILES['file'].read())
-            sum = load_data(json_data)
+            order_sum = load_data(json_data)
+            body = {
+                'name': str(order_sum)
+            }
+            api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
         else:
             database_update()
 
