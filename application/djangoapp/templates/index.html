@@ -8,12 +8,20 @@
  {% csrf_token %}
  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <button type="submit"> Mettre à jour la liste des produits </button>
+    <button name="prod" type="submit"> Mettre à jour la liste des produits </button>
+  </form>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="file">
+    <button  name="order" type="submit">Charger une commande client</button>
   </form>
     <p>{{ string }} {{ time }} {{ helloworld }}</p>
     Liste des produits:
     {% for product in products %}
     <p> codeProduct: {{ product.name }}, Price: {{  product.price }} €</p>
     {%  endfor %}
+    {%  if sum > 0 %}
+        <p>Somme des prix de la commande client : {{ sum }}</p>
+    {% endif %}
 </body>
 </html>

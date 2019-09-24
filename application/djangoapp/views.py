@@ -18,15 +18,19 @@ def helloworld(request):
 
 def products_update(request):
 
-    if request.method == "POST":
-        database_update()
-
-    products = Article.objects.all()
-
     helloworld = ''
     time = ''
     string = ''
+    sum = 0
 
+    if request.method == "POST":
+        if 'order' in request.POST and request.FILES['file']:
+            json_data = json.loads(request.FILES['file'].read())
+            sum = load_data(json_data)
+        else:
+            database_update()
+
+    products = Article.objects.all()
 
     time = api.send_request('scheduler', 'clock/time')
     helloworld = api.send_request('gestion-magasin', 'hello')
@@ -36,10 +40,24 @@ def products_update(request):
         'time': time,
         'helloworld': helloworld,
         'string': string,
-        'products': products
+        'products': products,
+        'sum': sum
     }
 
     return render(request, 'index.html', context)
+
+def load_data(json_data):
+    tmp = []
+    for list_product in json_data["list_product"]:
+        for list in list_product["list"]:
+            tmp.append(list)
+    return compute_price(tmp)
+
+def compute_price(data):
+    sum = 0
+    for elt in data:
+        sum += Article.objects.get(name=elt).price
+    return sum
 
 @csrf_exempt
 def scheduler(request):
