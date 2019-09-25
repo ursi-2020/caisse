@@ -20,8 +20,15 @@
     {% for product in products %}
     <p> codeProduct: {{ product.name }}, Price: {{  product.price }} €</p>
     {%  endfor %}
+    <br>
+    {%  if client != '' %}
+        <p> <b>Client :</b> {{ client.firstName }} {{ client.lastName }}</p>
+    {% endif %}
+    <br>
     {%  if sum > 0 %}
-        <p>Somme des prix de la commande client : {{ sum }}</p>
+        <p><b>Somme des prix de la commande client : </b>{{ sum }}€</p>
+        <p><b>Reduction:</b> {{ reduction }}€</p>
+        <p><b> Prix total à payer: </b>{{ final_price }}€</p>
     {% endif %}
 </body>
 </html>

@@ -21,14 +21,21 @@ def products_update(request):
     helloworld = ''
     time = ''
     string = ''
-    sum = 0
+    order_sum = 0
+    client = ''
+    reduction = 0
 
     if request.method == "POST":
         if 'order' in request.POST and request.FILES['file']:
             json_data = json.loads(request.FILES['file'].read())
             order_sum = load_data(json_data)
+            client = json.loads(api.send_request('crm', 'api/data/' + json_data['client_id']))[0]
+            print(client)
+            if client:
+                reduction = client['fidelityPoint'] // 20
+
             body = {
-                'name': str(order_sum)
+                'name': str(order_sum - reduction)
             }
             api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
         else:
@@ -39,13 +46,17 @@ def products_update(request):
     time = api.send_request('scheduler', 'clock/time')
     helloworld = api.send_request('gestion-magasin', 'hello')
     string = 'Il est'
+    final_price = order_sum - reduction
 
     context = {
         'time': time,
         'helloworld': helloworld,
         'string': string,
         'products': products,
-        'sum': sum
+        'sum': order_sum,
+        'client': client,
+        'reduction': reduction,
+        'final_price': final_price
     }
 
     return render(request, 'index.html', context)
