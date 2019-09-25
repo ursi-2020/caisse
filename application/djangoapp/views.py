@@ -18,9 +18,6 @@ def helloworld(request):
 @csrf_exempt
 def products_update(request):
 
-    helloworld = ''
-    time = ''
-    string = ''
     order_sum = 0
     client = ''
     reduction = 0
@@ -49,9 +46,6 @@ def products_update(request):
     final_price = order_sum - reduction
 
     context = {
-        'time': time,
-        'helloworld': helloworld,
-        'string': string,
         'products': products,
         'sum': order_sum,
         'client': client,
