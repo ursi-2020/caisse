@@ -10,12 +10,13 @@ import json
 
 def index(request):
   #  api.post_request('scheduler', 'app/delete', {"source": "caisse"})
+    Article.objects.all().delete()
     return HttpResponse("Bienvenue sur l'appli caisse")
 
 def helloworld(request):
     return HttpResponse("Hello,je viens de la caisse")
 
-@csrf_exempt
+
 def products_update(request):
 
     order_sum = 0
@@ -40,9 +41,6 @@ def products_update(request):
 
     products = Article.objects.all()
 
-    time = api.send_request('scheduler', 'clock/time')
-    helloworld = api.send_request('gestion-magasin', 'hello')
-    string = 'Il est'
     final_price = order_sum - reduction
 
     context = {
@@ -68,7 +66,7 @@ def compute_price(data):
         sum += Article.objects.get(name=elt).price
     return sum
 
-@csrf_exempt
+
 def scheduler(request):
 
     schedule_result = ""
@@ -84,10 +82,10 @@ def scheduler(request):
     #    body = {"target_url": "database_update", "target_app": "caisse", "time": time_str, "recurrence": "day", "data": "",
      #           "source_app": "caisse", "name": "task1"}
 
-        body = {"target_url": "database_update", "target_app": "caisse", "time": final_time, "recurrence": "day", "data": "", "source_app": "caisse", "name": "random"}
+        body = {"target_url": "database_update", "target_app": "caisse/", "time": final_time, "recurrence": "day", "data": "", "source_app": "caisse", "name": "random"}
         print(body)
      #   schedule_result = api.post_request("scheduler", "schedule/add", body)
-        schedule_task("caisse", "database_update", final_time, "day", "", "caisse", "update_database2")
+        schedule_task("caisse", "database_update_scheduled", final_time, "day", "", "caisse", "update_database")
 
     tasks = api.send_request("scheduler", "schedule/list")
 
@@ -98,16 +96,32 @@ def scheduler(request):
 
     return render(request, 'scheduler.html', context)
 
+@csrf_exempt
 def database_update():
     Article.objects.all().delete()
 
-    data = api.send_request("catalogue-produit", "catalogueproduit/api/data")
+    data = api.send_request("gestion-magasin", "api/products")
+
+    json_data = json.loads(data)
+    print(json_data)
+    for product in json_data["produits"]:
+        article = Article(name=product["codeProduit"], price=product["prix"], stock=0)#product["quantiteMin"])
+        article.save()
+
+@csrf_exempt
+def database_update_scheduled(request):
+    print("j'ai bien été appelée")
+    Article.objects.all().delete()
+
+    data = api.send_request("gestion-magasin", "api/products")
 
     json_data = json.loads(data)
 
     for product in json_data["produits"]:
-        article = Article(name=product["codeProduit"], price=product["prix"], stock=product["quantiteMin"])
+        article = Article(name=product["codeProduit"], price=product["prix"], stock=0)#product["quantiteMin"])
         article.save()
+
+    return HttpResponse("Success")
 
 def schedule_task(host, url, time, recurrence, data, source, name):
     time_str = time.strftime('%d/%m/%Y-%H:%M:%S')
