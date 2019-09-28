@@ -9,8 +9,6 @@ from datetime import datetime
 import json
 
 def index(request):
-  #  api.post_request('scheduler', 'app/delete', {"source": "caisse"})
-    Article.objects.all().delete()
     return HttpResponse("Bienvenue sur l'appli caisse")
 
 def helloworld(request):
@@ -27,24 +25,20 @@ def products_update(request):
         if 'order' in request.POST and request.FILES['file']:
             json_data = json.loads(request.FILES['file'].read())
             order_sum = load_data(json_data)
-            client = json.loads(api.send_request('crm', 'api/data/' + json_data['client_id']))[0]
-            print(client)
+            client = json.loads(api.send_request('gestion-magasin', 'customers/?account=' + json_data['client_account']))
             if client:
                 reduction = client['fidelityPoint'] // 20
 
             body = {
-                'name': str(order_sum - reduction)
+                'amount': str(order_sum - reduction)
             }
             api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
         else:
             database_update()
 
-    products = Article.objects.all()
-
     final_price = order_sum - reduction
 
     context = {
-        'products': products,
         'sum': order_sum,
         'client': client,
         'reduction': reduction,
@@ -64,7 +58,7 @@ def compute_price(data):
     sum = 0
     for elt in data:
         sum += Article.objects.get(name=elt).price
-    return sum
+    return round(sum, 2)
 
 
 def scheduler(request):
@@ -77,13 +71,10 @@ def scheduler(request):
         day = date[2].split('-')
         final_time_str = day[0] + '/' + date[1] + '/' + date[0] + '-' + day[1]
         final_time = datetime.strptime(final_time_str, '%d/%m/%Y-%H:%M:%S')
-        time_str = final_time.strftime('%d/%m/%Y-%H:%M:%S')
-        print(time_str)
     #    body = {"target_url": "database_update", "target_app": "caisse", "time": time_str, "recurrence": "day", "data": "",
      #           "source_app": "caisse", "name": "task1"}
 
         body = {"target_url": "database_update", "target_app": "caisse/", "time": final_time, "recurrence": "day", "data": "", "source_app": "caisse", "name": "random"}
-        print(body)
      #   schedule_result = api.post_request("scheduler", "schedule/add", body)
         schedule_task("caisse", "database_update_scheduled", final_time, "day", "", "caisse", "update_database")
 
@@ -96,29 +87,36 @@ def scheduler(request):
 
     return render(request, 'scheduler.html', context)
 
+def database(request):
+    products = Article.objects.all()
+
+    context = {
+        'products': products
+    }
+
+    return render(request, 'database.html', context)
+
 @csrf_exempt
 def database_update():
     Article.objects.all().delete()
 
-    data = api.send_request("gestion-magasin", "api/products")
+    data = api.send_request("gestion-magasin", "products")
 
     json_data = json.loads(data)
-    print(json_data)
-    for product in json_data["produits"]:
-        article = Article(name=product["codeProduit"], price=product["prix"], stock=0)#product["quantiteMin"])
+    for product in json_data:
+        article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
         article.save()
 
 @csrf_exempt
 def database_update_scheduled(request):
-    print("j'ai bien été appelée")
     Article.objects.all().delete()
 
-    data = api.send_request("gestion-magasin", "api/products")
+    data = api.send_request("gestion-magasin", "products")
 
     json_data = json.loads(data)
 
-    for product in json_data["produits"]:
-        article = Article(name=product["codeProduit"], price=product["prix"], stock=0)#product["quantiteMin"])
+    for product in json_data:
+        article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
         article.save()
 
     return HttpResponse("Success")

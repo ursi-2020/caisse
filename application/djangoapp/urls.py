@@ -6,7 +6,7 @@ urlpatterns=[
     path('',views.index,name='index'),
     path('products_update/', views.products_update, name='products_update'),
     path('helloworld',views.helloworld,name='helloworld'),
-    path('scheduler', views.scheduler, name='scheduler'),
-    path('database_update', views.database_update, name='database_update'),
-    path('database_update_scheduled', views.database_update_scheduled, name='database_update_scheduled')
+    path('scheduler/', views.scheduler, name='scheduler'),
+    path('database_update_scheduled', views.database_update_scheduled, name='database_update_scheduled'),
+    path('database/', views.database, name='database')
 ]
