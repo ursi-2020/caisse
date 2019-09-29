@@ -22,17 +22,33 @@ def products_update(request):
     reduction = 0
 
     if request.method == "POST":
-        if 'order' in request.POST and request.FILES['file']:
-            json_data = json.loads(request.FILES['file'].read())
+        if 'order' in request.POST and request.FILES and request.FILES['file']:
+            try:
+                json_data = json.loads(request.FILES['file'].read())
+            except Exception as e:
+                return HttpResponse("Error in products update : " + str(e))
             order_sum = load_data(json_data)
-            client = json.loads(api.send_request('gestion-magasin', 'customers/?account=' + json_data['client_account']))
+            res_request = ""
+            try:
+                res_request = api.send_request('gestion-magasin', 'customers/?account=' + json_data['client_account'])
+            except Exception as e:
+                return HttpResponse("Error in products update : " + str(e))
+            try:
+                client = json.loads(res_request)
+            except Exception as e:
+                return HttpResponse("Error in products update : " + str(e))
             if client:
                 reduction = client['fidelityPoint'] // 20
 
             body = {
                 'amount': str(order_sum - reduction)
             }
-            api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
+            try:
+                api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
+            except Exception as e:
+                return HttpResponse("Error in products update : " + str(e))
+        elif 'order' in request.POST:
+            return HttpResponse("File not found")
         else:
             database_update()
 
@@ -66,7 +82,11 @@ def scheduler(request):
     schedule_result = ""
 
     if request.method == "POST":
-        time = (request.POST.get("time") + ":00").replace('-', '/').replace('T', '-')
+        time = ""
+        try:
+            time = (request.POST.get("time") + ":00").replace('-', '/').replace('T', '-')
+        except Exception as e:
+            return HttpResponse("Error in scheduler : " + str(e))
         date = time.split('/')
         day = date[2].split('-')
         final_time_str = day[0] + '/' + date[1] + '/' + date[0] + '-' + day[1]
@@ -78,7 +98,11 @@ def scheduler(request):
      #   schedule_result = api.post_request("scheduler", "schedule/add", body)
         schedule_task("caisse", "database_update_scheduled", final_time, "day", "", "caisse", "update_database")
 
-    tasks = api.send_request("scheduler", "schedule/list")
+    tasks = ""
+    try:
+        tasks = api.send_request("scheduler", "schedule/list")
+    except Exception as e:
+        return HttpResponse("Error in scheduler : " + str(e))
 
     context = {
         'request': schedule_result,
@@ -100,20 +124,38 @@ def database(request):
 def database_update():
     Article.objects.all().delete()
 
-    data = api.send_request("gestion-magasin", "products")
+    data = ""
+    try:
+        data = api.send_request("gestion-magasin", "products")
+    except Exception as e:
+        return HttpResponse("Error in database update" + str(e))
 
-    json_data = json.loads(data)
-    for product in json_data:
-        article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
-        article.save()
+    try:
+        json_data = json.loads(data)
+    except Exception as e:
+        return HttpResponse("Error in database update" + str(e))
+
+    try:
+        for product in json_data:
+            article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
+            article.save()
+    except Exception as e:
+        return HttpResponse("Error in the load of the items" + str(e))
 
 @csrf_exempt
 def database_update_scheduled(request):
     Article.objects.all().delete()
 
-    data = api.send_request("gestion-magasin", "products")
+    data = ""
+    try:
+        data = api.send_request("gestion-magasin", "products")
+    except Exception as e:
+        return HttpResponse("Error in database update scheduled : " + str(e))
 
-    json_data = json.loads(data)
+    try:
+        json_data = json.loads(data)
+    except Exception as e:
+        return HttpResponse("Error in database update scheduled : " + str(e))
 
     for product in json_data:
         article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
@@ -125,7 +167,14 @@ def schedule_task(host, url, time, recurrence, data, source, name):
     time_str = time.strftime('%d/%m/%Y-%H:%M:%S')
     headers = {'Host': 'scheduler'}
     data = {"target_url": url, "target_app": host, "time": time_str, "recurrence": recurrence, "data": data, "source_app": source, "name": name}
-    r = requests.post(api.api_services_url + 'schedule/add', headers = headers, json = data)
-    print(r.status_code)
-    print(r.text)
-    return r.text
+    r = ""
+    try:
+        r = requests.post(api.api_services_url + 'schedule/add', headers = headers, json = data)
+    except Exception as e:
+        return HttpResponse("Error in schedule_task : " + str(e))
+    if r:
+        print(r.status_code)
+        print(r.text)
+        return r.text
+    else:
+        return r
