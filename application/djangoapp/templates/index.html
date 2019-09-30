@@ -6,10 +6,22 @@
 </head>
 <body>
  {% csrf_token %}
- <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button name="database" type="submit"> Accéder à la base de données </button>
+  </form>
+ <br>
+ {% csrf_token %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button name="delete" type="submit"> Supprimer la liste des produits </button>
+  </form>
+ <br>
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <button name="prod" type="submit"> Mettre à jour la liste des produits </button>
   </form>
+ <br>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="file">

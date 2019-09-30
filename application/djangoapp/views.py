@@ -22,7 +22,11 @@ def products_update(request):
     reduction = 0
 
     if request.method == "POST":
-        if 'order' in request.POST and request.FILES and request.FILES['file']:
+        if 'database' in request.POST:
+          return database(request)
+        elif 'delete' in request.POST:
+            Article.objects.all().delete()
+        elif 'order' in request.POST and request.FILES and request.FILES['file']:
             try:
                 json_data = json.loads(request.FILES['file'].read())
             except Exception as e:
