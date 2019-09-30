@@ -6,6 +6,7 @@
 * [Communication](communication.md)
 * [Flux](flux.md)
 * [Use Case](use-case.md)
+* [Routes](routes.md)
 
 # Rôle de l'application
 
