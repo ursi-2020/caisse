@@ -20,6 +20,7 @@ def products_update(request):
     order_sum = 0
     client = ''
     reduction = 0
+    fidelity_points = 0
 
     if request.method == "POST":
         if 'database' in request.POST:
@@ -42,7 +43,8 @@ def products_update(request):
             except Exception as e:
                 return HttpResponse("Error in products update : " + str(e))
             if client:
-                reduction = client['fidelityPoint'] // 20
+                fidelity_points = client['fidelityPoint']
+                reduction = fidelity_points // 20
 
             body = {
                 'amount': str(order_sum - reduction)
@@ -60,6 +62,7 @@ def products_update(request):
 
     context = {
         'sum': order_sum,
+        'fidelity_points': fidelity_points,
         'client': client,
         'reduction': reduction,
         'final_price': final_price

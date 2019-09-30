@@ -33,6 +33,7 @@
     <br>
     {%  if sum > 0 %}
         <p><b>Somme des prix de la commande client : </b>{{ sum }}€</p>
+        <p><b>Points de fidélité disponibles :</b>  {{ fidelity_points }}</p>
         <p><b>Reduction:</b> {{ reduction }}€</p>
         <p><b> Prix total à payer: </b>{{ final_price }}€</p>
     {% endif %}
