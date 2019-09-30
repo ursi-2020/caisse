@@ -12,8 +12,9 @@ Go to: [Endpoints](#endpoints), [Models](#models).
 { 
    "list_product":[ 
       { 
-         "list":["X2-0","X3-0","X6-0","X7-0"]
+         "list":["X2-0","X3-0","X4-0","X5-0"]
       }
-   ]
+   ],
+   "client_account": "BKN1CST53"
 }
 ```
