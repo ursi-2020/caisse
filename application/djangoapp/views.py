@@ -44,7 +44,7 @@ def products_update(request):
                 'amount': str(order_sum - reduction)
             }
             try:
-                api.post_request('gestion-paiement', 'gestion-paiement/proceed-payement', body)
+                api.post_request('gestion-paiement', 'proceed-payement', body)
             except Exception as e:
                 return HttpResponse("Error in products update : " + str(e))
         elif 'order' in request.POST:
