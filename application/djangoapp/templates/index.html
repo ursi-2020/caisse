@@ -24,6 +24,11 @@
  <br>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <button name="scheduler" type="submit"> Scheduler la mise à jour de la liste des produits </button>
+  </form>
+ <br>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
     <input type="file" name="file">
     <button  name="order" type="submit">Charger une commande client</button>
   </form>

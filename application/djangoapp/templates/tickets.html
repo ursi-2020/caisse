@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Caisse App</title>
+    <h1>Caisse App</h1>
+</head>
+<body>
+    Liste des tickets:
+    {% for ticket in tickets %}
+    <p> {
+        Date: {{ ticket.date }},
+        Prix: {{  ticket.prix / 100 }} €,
+        Client: {{ ticket.client }},
+        Articles: {
+            {%  for article in ticket.articles %}
+                {{ article.nom }},
+            {% endfor %}
+                  },
+        pointsFidelite: {{ ticket.pointsFidelite }},
+        modePaiement: {{ ticket.modePaiement }}
+    }
+    </p>
+    {%  endfor %}
+</body>

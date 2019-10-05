@@ -8,5 +8,6 @@ urlpatterns=[
     path('helloworld',views.helloworld,name='helloworld'),
     path('scheduler/', views.scheduler, name='scheduler'),
     path('database_update_scheduled', views.database_update_scheduled, name='database_update_scheduled'),
-    path('database/', views.database, name='database')
+    path('database/', views.database, name='database'),
+    path('tickets/', views.tickets, name='tickets')
 ]

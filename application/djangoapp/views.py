@@ -4,7 +4,7 @@ from apipkg import api_manager as api
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Article
+from .models import Article, Ticket
 from datetime import datetime
 import json
 
@@ -27,32 +27,14 @@ def products_update(request):
           return database(request)
         elif 'delete' in request.POST:
             Article.objects.all().delete()
+        elif 'scheduler' in request.POST:
+            return scheduler(request)
         elif 'order' in request.POST and request.FILES and request.FILES['file']:
             try:
                 json_data = json.loads(request.FILES['file'].read())
             except Exception as e:
                 return HttpResponse("Error in products update : " + str(e))
-            order_sum = load_data(json_data)
-            res_request = ""
-            try:
-                res_request = api.send_request('gestion-magasin', 'customers/?account=' + json_data['client_account'])
-            except Exception as e:
-                return HttpResponse("Error in products update : " + str(e))
-            try:
-                client = json.loads(res_request)
-            except Exception as e:
-                return HttpResponse("Error in products update : " + str(e))
-            if client:
-                fidelity_points = client['fidelityPoint']
-                reduction = fidelity_points // 20
-
-            body = {
-                'amount': str(order_sum - reduction)
-            }
-            try:
-                api.post_request('gestion-paiement', 'proceed-payement', body)
-            except Exception as e:
-                return HttpResponse("Error in products update : " + str(e))
+            sales(json_data)
         elif 'order' in request.POST:
             return HttpResponse("File not found")
         else:
@@ -70,6 +52,53 @@ def products_update(request):
 
     return render(request, 'index.html', context)
 
+
+def sales(json_data):
+    if json_data["tickets"]:
+        for ticket in json_data["tickets"]:
+            if ticket["panier"]:
+                sum = 0
+                articles = []
+                for product in ticket["panier"]:
+                    quantity = product["quantity"]
+                    try:
+                        article = Article.objects.get(codeProduit=product["codeProduit"])
+                        articles.append(article)
+                    except Exception:
+                        return HttpResponse("Article doesn't exist in our database")
+                    sum += (quantity * article.prix)
+                client = ""
+                if ticket["carteFid"]:
+                    try:
+                        client = api.send_request('gestion-magasin', 'customers/?account=' + ticket["carteFid"])
+                    except Exception:
+                        return HttpResponse("Client inconnu")
+
+                mode_paiement = "CASH"
+                if ticket["modePaiement"] == "CARD":
+                    card = ticket["card"]
+                    mode_paiement = "CARD"
+                    body = {
+                        'amount': sum,
+                        'payement_method': mode_paiement,
+                        'client_id': client["id"],
+                        'card': card
+                    }
+                    try:
+                        paiement = api.post_request('gestion-paiement', 'proceed-payement', body)
+                        if paiement['status'] != 'OK':
+                            return
+                    except Exception:
+                        return
+
+                new_ticket = Ticket(date=datetime.now(), prix=sum, client=client["account"], pointsFidelite=0, articles=articles, modePaiement=mode_paiement)
+                try:
+                    new_ticket.save()
+                except Exception:
+                    return HttpResponse("Impossible to save the ticket")
+
+
+
 def load_data(json_data):
     tmp = []
     for list_product in json_data["list_product"]:
@@ -80,7 +109,7 @@ def load_data(json_data):
 def compute_price(data):
     sum = 0
     for elt in data:
-        sum += Article.objects.get(name=elt).price
+        sum += Article.objects.get(name=elt).prix
     return round(sum, 2)
 
 
@@ -98,11 +127,7 @@ def scheduler(request):
         day = date[2].split('-')
         final_time_str = day[0] + '/' + date[1] + '/' + date[0] + '-' + day[1]
         final_time = datetime.strptime(final_time_str, '%d/%m/%Y-%H:%M:%S')
-    #    body = {"target_url": "database_update", "target_app": "caisse", "time": time_str, "recurrence": "day", "data": "",
-     #           "source_app": "caisse", "name": "task1"}
 
-        body = {"target_url": "database_update", "target_app": "caisse/", "time": final_time, "recurrence": "day", "data": "", "source_app": "caisse", "name": "random"}
-     #   schedule_result = api.post_request("scheduler", "schedule/add", body)
         schedule_task("caisse", "database_update_scheduled", final_time, "day", "", "caisse", "update_database")
 
     tasks = ""
@@ -127,6 +152,15 @@ def database(request):
 
     return render(request, 'database.html', context)
 
+def tickets(request):
+    tickets = Ticket.objects.all()
+
+    context = {
+        'tickets': tickets
+    }
+
+    return render(request, 'tickets.html', context)
+
 @csrf_exempt
 def database_update():
     Article.objects.all().delete()
@@ -144,7 +178,7 @@ def database_update():
 
     try:
         for product in json_data:
-            article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
+            article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"])
             article.save()
     except Exception as e:
         return HttpResponse("Error in the load of the items" + str(e))
@@ -165,7 +199,7 @@ def database_update_scheduled(request):
         return HttpResponse("Error in database update scheduled : " + str(e))
 
     for product in json_data:
-        article = Article(name=product["codeProduit"], price=product["prix"] / 100, stock=0)#product["quantiteMin"])
+        article = Article(codeProduit=product["codeProduit"], prix=product["prix"] / 100, stock=product["quantiteMin"])
         article.save()
 
     return HttpResponse("Success")
