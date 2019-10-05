@@ -9,7 +9,7 @@
     {% for ticket in tickets %}
     <p> {
         Date: {{ ticket.date }},
-        Prix: {{  ticket.prix / 100 }} €,
+        Prix: {% widthratio ticket.prix 10 1 %} €,
         Client: {{ ticket.client }},
         Articles: {
             {%  for article in ticket.articles %}

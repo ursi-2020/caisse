@@ -164,7 +164,6 @@ def tickets(request):
 @csrf_exempt
 def database_update():
     Article.objects.all().delete()
-
     data = ""
     try:
         data = api.send_request("gestion-magasin", "products")
@@ -179,6 +178,7 @@ def database_update():
     try:
         for product in json_data:
             article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"])
+            print("oui: " + article.codeProduit)
             article.save()
     except Exception as e:
         return HttpResponse("Error in the load of the items" + str(e))
