@@ -1,8 +1,9 @@
 import requests
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from apipkg import api_manager as api
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
 from .models import Article, Ticket
 from datetime import datetime
@@ -98,6 +99,10 @@ def sales(json_data):
                     return HttpResponse("Impossible to save the ticket")
 
 
+@require_GET
+def get_tickets(request):
+    tickets = list(Ticket.objects.all().values())
+    return JsonResponse(tickets, safe=False)
 
 def load_data(json_data):
     tmp = []
@@ -153,6 +158,7 @@ def database(request):
     return render(request, 'database.html', context)
 
 def tickets(request):
+    today = datetime.now()
     tickets = Ticket.objects.all()
 
     context = {
