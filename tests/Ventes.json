@@ -1,0 +1,88 @@
+{
+  "success": "true",
+  "result": "ok, 17 tickets generated",
+  "tickets": [
+    {
+      "caisse": "3",
+      "panier": [
+        {
+          "codeProduit": "X1-0",
+          "description": "Livre:P2-43",
+          "quantity": 1
+        }
+      ],
+      "modePaiement": "CASH"
+    },
+    {
+      "caisse": "1",
+      "panier": [
+        {
+          "codeProduit": "X1-0",
+          "description": "TV:P2-48",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-1",
+          "description": "TV:P1-13",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-10",
+          "description": "Livre:P2-39",
+          "quantity": 1
+        }
+      ],
+      "modePaiement": "CASH"
+    },
+    {
+      "caisse": "2",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Frigos:P1-18",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "Console:P2-46",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-0",
+          "description": "Console:P2-14",
+          "quantity": 2
+        }
+      ],
+      "carteFid": "33",
+      "modePaiement": "CARD",
+      "card": "BKN1CST17"
+
+    },
+    {
+      "caisse": "4",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Console:P3-24",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "DVD:P2-34",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-4",
+          "description": "Console:P2-27",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-8",
+          "description": "DVD:P2-12",
+          "quantity": 1
+        }
+      ],
+      "modePaiement": "CASH"
+    }
+  ]
+}

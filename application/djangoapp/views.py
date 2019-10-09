@@ -5,8 +5,11 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
+from application.djangoapp.serializers import TicketSerializer
 from .models import Article, Ticket
+from django.utils import timezone
 from datetime import datetime
+
 import json
 
 def index(request):
@@ -24,10 +27,14 @@ def products_update(request):
     fidelity_points = 0
 
     if request.method == "POST":
-        if 'database' in request.POST:
+        if 'products' in request.POST:
           return database(request)
-        elif 'delete' in request.POST:
+        elif 'delete_products' in request.POST:
             Article.objects.all().delete()
+        elif 'tickets' in request.POST:
+          return tickets(request)
+        elif 'delete_tickets' in request.POST:
+            Ticket.objects.all().delete()
         elif 'scheduler' in request.POST:
             return scheduler(request)
         elif 'order' in request.POST and request.FILES and request.FILES['file']:
@@ -55,25 +62,20 @@ def products_update(request):
 
 
 def sales(json_data):
-    if json_data["tickets"]:
+    if "tickets" in json_data:
         for ticket in json_data["tickets"]:
-            if ticket["panier"]:
+            if "panier" in ticket:
                 sum = 0
                 articles = []
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
-                    try:
-                        article = Article.objects.get(codeProduit=product["codeProduit"])
-                        articles.append(article)
-                    except Exception:
-                        return HttpResponse("Article doesn't exist in our database")
+
+                    article = Article.objects.get(codeProduit=product["codeProduit"])
+                    articles.append(article)
                     sum += (quantity * article.prix)
                 client = ""
-                if ticket["carteFid"]:
-                    try:
-                        client = api.send_request('gestion-magasin', 'customers/?account=' + ticket["carteFid"])
-                    except Exception:
-                        return HttpResponse("Client inconnu")
+                if "cardFid" in ticket:
+                    client = api.send_request('gestion-magasin', 'customers/?account=' + ticket["carteFid"])["account"]
 
                 mode_paiement = "CASH"
                 if ticket["modePaiement"] == "CARD":
@@ -82,27 +84,32 @@ def sales(json_data):
                     body = {
                         'amount': sum,
                         'payement_method': mode_paiement,
-                        'client_id': client["id"],
+                        'client_id': client,
                         'card': card
                     }
-                    try:
-                        paiement = api.post_request('gestion-paiement', 'proceed-payement', body)
-                        if paiement['status'] != 'OK':
-                            return
-                    except Exception:
+                    paiement = api.post_request('gestion-paiement', 'api/proceed-payement', body)
+                    if paiement != 200:
                         return
 
-                new_ticket = Ticket(date=datetime.now(), prix=sum, client=client["account"], pointsFidelite=0, articles=articles, modePaiement=mode_paiement)
-                try:
-                    new_ticket.save()
-                except Exception:
-                    return HttpResponse("Impossible to save the ticket")
+
+                new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0, modePaiement=mode_paiement)
+                new_ticket.save()
+                new_ticket.articles.set(articles)
+                new_ticket.save()
 
 
 @require_GET
 def get_tickets(request):
-    tickets = list(Ticket.objects.all().values())
-    return JsonResponse(tickets, safe=False)
+    tickets = Ticket.objects.all()
+    data = TicketSerializer(tickets, many=True).data
+    for ticket in data:
+        articles_code = []
+        for article in ticket['articles']:
+            current = Article.objects.get(id=article)
+            articles_code.append(current.codeProduit)
+        ticket['articles'] = articles_code
+
+    return JsonResponse(data, safe=False)
 
 def load_data(json_data):
     tmp = []
@@ -149,8 +156,9 @@ def scheduler(request):
     return render(request, 'scheduler.html', context)
 
 def database(request):
-    products = Article.objects.all()
-
+    products = Article.objects.all().values()
+    for product in products:
+        product.update(prix=product['prix'] / 100)
     context = {
         'products': products
     }
@@ -158,9 +166,9 @@ def database(request):
     return render(request, 'database.html', context)
 
 def tickets(request):
-    today = datetime.now()
-    tickets = Ticket.objects.all()
-
+    tickets = Ticket.objects.all().values()
+    for ticket in tickets:
+        ticket.update(prix=ticket['prix'] / 100)
     context = {
         'tickets': tickets
     }
@@ -184,7 +192,6 @@ def database_update():
     try:
         for product in json_data:
             article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"])
-            print("oui: " + article.codeProduit)
             article.save()
     except Exception as e:
         return HttpResponse("Error in the load of the items" + str(e))

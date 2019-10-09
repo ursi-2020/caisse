@@ -7,6 +7,6 @@
 <body>
     Liste des produits:
     {% for product in products %}
-    <p> codeProduit: {{ product.codeProduit }}, Prix: {% widthratio ticket.prix 10 1 %} €</p>
+    <p> codeProduit: {{ product.codeProduit }}, Prix: {{ product.prix }} €</p>
     {%  endfor %}
 </body>

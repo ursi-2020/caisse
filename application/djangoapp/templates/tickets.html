@@ -9,11 +9,11 @@
     {% for ticket in tickets %}
     <p> {
         Date: {{ ticket.date }},
-        Prix: {% widthratio ticket.prix 10 1 %} €,
+        Prix: {{ ticket.prix }} €,
         Client: {{ ticket.client }},
         Articles: {
-            {%  for article in ticket.articles %}
-                {{ article.nom }},
+            {%  for article in ticket.articles.all %}
+                {{ article.codeProduit }},
             {% endfor %}
                   },
         pointsFidelite: {{ ticket.pointsFidelite }},
