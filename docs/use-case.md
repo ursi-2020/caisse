@@ -2,14 +2,12 @@
 
 # Use case
 
-![Diagramme de séquence](./UseCases.JPG)
-
 # Dataflow
 
-![Diagramme de séquence](./dataflow.JPG)
+![Diagramme de séquence](img/dataflow.JPG)
 
-![Diagramme de séquence](./dataflow2.JPG)
+![Diagramme de séquence](img/dataflow2.JPG)
 
-![Diagramme de séquence](./dataflow3.JPG)
+![Diagramme de séquence](img/dataflow3.JPG)
 
-![Diagramme de séquence](./dataflow4.JPG)
+![Diagramme de séquence](img/dataflow4.JPG)

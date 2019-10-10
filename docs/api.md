@@ -30,7 +30,16 @@ Get the tickets registered in the "caisse" db.
     "client": "33",
     "pointsFidelite": 0,
     "modePaiement": "CASH",
-    "articles": ["X1-0", "X1-1"]
+    "articles": [
+      {
+        "codeProduit": "X1-0",
+        "quantity": 2                
+      },
+      {
+        "codeProduit": "X1-9",
+        "quantity": 1
+      }
+    ]
   },
   {
     "id": 38,
@@ -39,7 +48,12 @@ Get the tickets registered in the "caisse" db.
     "client": "22",
     "pointsFidelite": 18,
     "modePaiement": "CARD",
-    "articles": ["X1-4", "X1-1"]
+    "articles": [
+      {
+        "codeProduit": "X1-4",
+        "quantity": 2
+      }
+    ]
   }
 ]
 ```

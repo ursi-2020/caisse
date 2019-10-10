@@ -3,8 +3,6 @@
 # Sections
 
 * [API](api.md)
-* [Communication](communication.md)
-* [Flux](flux.md)
 * [Use Case](use-case.md)
 * [Routes](routes.md)
 
@@ -23,3 +21,15 @@ La `caisse` peut également commander un produit pour un client
 
 En local, la `caisse` peut schéduler la mise à jour de la base de données, mettre à jour la base de données manuellement et afficher le prix à payer, les promotions appliquées et les points de fidélités disponible.
 La caisse peut chercher un produit dans le stock local.
+
+# Use Case
+
+*[Anciennes versions des Uses Cases](use-case.md)*
+
+![use case](img/UseCases.jpg)
+# Membres du groupe
+
+* Romain Chevennement
+* Jean-Baptiste Benoist
+* Alexandre Buhl
+* Théodore Pegorier-Lachmann
