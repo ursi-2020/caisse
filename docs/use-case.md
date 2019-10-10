@@ -2,7 +2,7 @@
 
 # Use case
 
-![Diagramme de séquence](./use%20case.JPG)
+![Diagramme de séquence](./UseCases.JPG)
 
 # Dataflow
 

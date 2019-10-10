@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
 from application.djangoapp.serializers import TicketSerializer
-from .models import Article, Ticket
+from .models import Article, Ticket, ArticlesList
 from django.utils import timezone
 from datetime import datetime
 
@@ -71,7 +71,9 @@ def sales(json_data):
                     quantity = product["quantity"]
 
                     article = Article.objects.get(codeProduit=product["codeProduit"])
-                    articles.append(article)
+                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity)
+                    article_list.save()
+                    articles.append(article_list)
                     sum += (quantity * article.prix)
                 client = ""
                 if "cardFid" in ticket:
@@ -94,6 +96,7 @@ def sales(json_data):
 
                 new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0, modePaiement=mode_paiement)
                 new_ticket.save()
+                print(articles)
                 new_ticket.articles.set(articles)
                 new_ticket.save()
 
@@ -104,9 +107,11 @@ def get_tickets(request):
     data = TicketSerializer(tickets, many=True).data
     for ticket in data:
         articles_code = []
+        count = 0
         for article in ticket['articles']:
-            current = Article.objects.get(id=article)
-            articles_code.append(current.codeProduit)
+            current = ArticlesList.objects.get(id=article)
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite}
+            articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
 
     return JsonResponse(data, safe=False)
@@ -166,9 +171,10 @@ def database(request):
     return render(request, 'database.html', context)
 
 def tickets(request):
-    tickets = Ticket.objects.all().values()
+    tickets = Ticket.objects.all()
     for ticket in tickets:
-        ticket.update(prix=ticket['prix'] / 100)
+        ticket.prix = ticket.prix / 100
+    print(tickets)
     context = {
         'tickets': tickets
     }

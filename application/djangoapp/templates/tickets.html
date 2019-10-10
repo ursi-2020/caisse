@@ -11,11 +11,14 @@
         Date: {{ ticket.date }},
         Prix: {{ ticket.prix }} €,
         Client: {{ ticket.client }},
-        Articles: {
+        Articles: [
             {%  for article in ticket.articles.all %}
-                {{ article.codeProduit }},
+                {
+                    codeProduit: {{ article.codeProduit }},
+                    quantité: {{ article.quantite }}
+                },
             {% endfor %}
-                  },
+                  ],
         pointsFidelite: {{ ticket.pointsFidelite }},
         modePaiement: {{ ticket.modePaiement }}
     }
