@@ -6,7 +6,7 @@
       "caisse": "3",
       "panier": [
         {
-          "codeProduit": "X1-0",
+          "codeProduit": "X1-3",
           "description": "Livre:P2-43",
           "quantity": 1
         }
@@ -17,12 +17,12 @@
       "caisse": "1",
       "panier": [
         {
-          "codeProduit": "X1-0",
+          "codeProduit": "X1-3",
           "description": "TV:P2-48",
           "quantity": 1
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-4",
           "description": "TV:P1-13",
           "quantity": 2
         },
@@ -48,7 +48,7 @@
           "quantity": 2
         },
         {
-          "codeProduit": "X1-0",
+          "codeProduit": "X1-3",
           "description": "Console:P2-14",
           "quantity": 2
         }

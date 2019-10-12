@@ -4,8 +4,8 @@ from apipkg import api_manager as api
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from django.core import serializers
 
-from application.djangoapp.serializers import TicketSerializer
 from .models import Article, Ticket, ArticlesList
 from django.utils import timezone
 from datetime import datetime
@@ -69,7 +69,6 @@ def sales(json_data):
                 articles = []
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
-
                     article = Article.objects.get(codeProduit=product["codeProduit"])
                     article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity)
                     article_list.save()
@@ -96,7 +95,6 @@ def sales(json_data):
 
                 new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0, modePaiement=mode_paiement)
                 new_ticket.save()
-                print(articles)
                 new_ticket.articles.set(articles)
                 new_ticket.save()
 
@@ -104,31 +102,19 @@ def sales(json_data):
 @require_GET
 def get_tickets(request):
     tickets = Ticket.objects.all()
-    data = TicketSerializer(tickets, many=True).data
-    for ticket in data:
+    data = json.loads(serializers.serialize('json', tickets))
+    response = []
+    for ticket_json in data:
+        ticket = ticket_json["fields"]
         articles_code = []
-        count = 0
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
             json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
+        response.append(ticket)
 
-    return JsonResponse(data, safe=False)
-
-def load_data(json_data):
-    tmp = []
-    for list_product in json_data["list_product"]:
-        for list in list_product["list"]:
-            tmp.append(list)
-    return compute_price(tmp)
-
-def compute_price(data):
-    sum = 0
-    for elt in data:
-        sum += Article.objects.get(name=elt).prix
-    return round(sum, 2)
-
+    return JsonResponse(response, safe=False)
 
 def scheduler(request):
 
@@ -174,7 +160,6 @@ def tickets(request):
     tickets = Ticket.objects.all()
     for ticket in tickets:
         ticket.prix = ticket.prix / 100
-    print(tickets)
     context = {
         'tickets': tickets
     }
