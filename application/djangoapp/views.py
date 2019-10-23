@@ -89,6 +89,7 @@ def sales(json_data):
                         'card': card
                     }
                     paiement = api.post_request('gestion-paiement', 'api/proceed-payement', body)
+                    print(paiement)
                     if paiement != 200:
                         return
 
