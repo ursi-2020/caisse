@@ -76,7 +76,7 @@ def sales(json_data):
                     sum += (quantity * article.prix)
                 client = ""
                 if "cardFid" in ticket:
-                    client = api.send_request('gestion-magasin', 'customers/?account=' + ticket["carteFid"])["account"]
+                    client = api.send_request('gestion-magasin', 'api/customers/?account=' + ticket["carteFid"])["account"]
 
                 mode_paiement = "CASH"
                 if ticket["modePaiement"] == "CARD":
@@ -171,7 +171,7 @@ def database_update():
     Article.objects.all().delete()
     data = ""
     try:
-        data = api.send_request("gestion-magasin", "products")
+        data = api.send_request("gestion-magasin", "api/products")
     except Exception as e:
         return HttpResponse("Error in database update" + str(e))
 
@@ -193,7 +193,7 @@ def database_update_scheduled(request):
 
     data = ""
     try:
-        data = api.send_request("gestion-magasin", "products")
+        data = api.send_request("gestion-magasin", "api/products")
     except Exception as e:
         return HttpResponse("Error in database update scheduled : " + str(e))
 
