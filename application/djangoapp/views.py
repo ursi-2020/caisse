@@ -76,7 +76,7 @@ def sales(json_data):
                     sum += (quantity * article.prix)
                 client = ""
                 if "carteFid" in ticket:
-                    client = json.loads(api.send_request('gestion-magasin', 'api/customers/?account=' + ticket["carteFid"]))["compte"]
+                    client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))["carteFid"]
 
                 mode_paiement = "CASH"
                 if ticket["modePaiement"] == "CARD":
