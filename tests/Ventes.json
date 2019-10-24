@@ -96,12 +96,12 @@
         {
           "codeProduit": "X1-9",
           "description": "Console:P2-46",
-          "quantity": 2
+          "quantity": 1
         },
         {
           "codeProduit": "X1-1",
           "description": "Console:P2-14",
-          "quantity": 2
+          "quantity": 1
         }
       ],
       "carteFid": "33",
@@ -115,12 +115,12 @@
         {
           "codeProduit": "X1-10",
           "description": "Frigos:P1-18",
-          "quantity": 1
+          "quantity": 2
         },
         {
           "codeProduit": "X1-9",
           "description": "Console:P2-46",
-          "quantity": 2
+          "quantity": 1
         },
         {
           "codeProduit": "X1-1",
@@ -139,17 +139,17 @@
         {
           "codeProduit": "X1-10",
           "description": "Frigos:P1-18",
-          "quantity": 1
+          "quantity": 3
         },
         {
           "codeProduit": "X1-9",
           "description": "Console:P2-46",
-          "quantity": 2
+          "quantity": 1
         },
         {
           "codeProduit": "X1-1",
           "description": "Console:P2-14",
-          "quantity": 2
+          "quantity": 1
         }
       ],
       "carteFid": "33",
@@ -163,7 +163,7 @@
         {
           "codeProduit": "X1-10",
           "description": "Frigos:P1-18",
-          "quantity": 1
+          "quantity": 4
         },
         {
           "codeProduit": "X1-9",
