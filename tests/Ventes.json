@@ -11,7 +11,8 @@
           "quantity": 1
         }
       ],
-      "modePaiement": "CASH"
+      "modePaiement": "CARD",
+	 "card":"BKN1CST18" 
     },
     {
       "caisse": "1",
@@ -83,6 +84,103 @@
         }
       ],
       "modePaiement": "CASH"
+    },
+    {
+      "caisse": "2",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Frigos:P1-18",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "Console:P2-46",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-1",
+          "description": "Console:P2-14",
+          "quantity": 2
+        }
+      ],
+      "carteFid": "33",
+      "modePaiement": "CARD",
+      "card": "BKN1CST17"
+
+    },
+    {
+      "caisse": "2",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Frigos:P1-18",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "Console:P2-46",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-1",
+          "description": "Console:P2-14",
+          "quantity": 2
+        }
+      ],
+      "carteFid": "33",
+      "modePaiement": "CARD",
+      "card": "BKN1CST17"
+
+    },
+    {
+      "caisse": "2",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Frigos:P1-18",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "Console:P2-46",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-1",
+          "description": "Console:P2-14",
+          "quantity": 2
+        }
+      ],
+      "carteFid": "33",
+      "modePaiement": "CARD",
+      "card": "BKN1CST17"
+
+    },
+    {
+      "caisse": "2",
+      "panier": [
+        {
+          "codeProduit": "X1-10",
+          "description": "Frigos:P1-18",
+          "quantity": 1
+        },
+        {
+          "codeProduit": "X1-9",
+          "description": "Console:P2-46",
+          "quantity": 2
+        },
+        {
+          "codeProduit": "X1-1",
+          "description": "Console:P2-14",
+          "quantity": 2
+        }
+      ],
+      "carteFid": "33",
+      "modePaiement": "CARD",
+      "card": "BKN1CST17"
+
     }
+
   ]
 }

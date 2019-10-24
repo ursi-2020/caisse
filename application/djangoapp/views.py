@@ -88,16 +88,20 @@ def sales(json_data):
                         'client_id': client,
                         'card': card
                     }
-                    paiement = api.post_request('gestion-paiement', 'api/proceed-payement', body)
-                    print(paiement)
-                    if paiement != 200:
-                        return
-
-
-                new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0, modePaiement=mode_paiement)
-                new_ticket.save()
-                new_ticket.articles.set(articles)
-                new_ticket.save()
+                    paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
+                    response = json.loads(paiement[1].content)
+                    if paiement[0] == 200 and response["status"] == "OK":
+                        new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
+                                            modePaiement=mode_paiement)
+                        new_ticket.save()
+                        new_ticket.articles.set(articles)
+                        new_ticket.save()
+                else:
+                    new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
+                                        modePaiement=mode_paiement)
+                    new_ticket.save()
+                    new_ticket.articles.set(articles)
+                    new_ticket.save()
 
 
 @require_GET
