@@ -21,11 +21,6 @@ def helloworld(request):
 
 def products_update(request):
 
-    order_sum = 0
-    client = ''
-    reduction = 0
-    fidelity_points = 0
-
     if request.method == "POST":
         if 'products' in request.POST:
           return database(request)
@@ -48,14 +43,8 @@ def products_update(request):
         else:
             database_update()
 
-    final_price = order_sum - reduction
 
     context = {
-        'sum': order_sum,
-        'fidelity_points': fidelity_points,
-        'client': client,
-        'reduction': reduction,
-        'final_price': final_price
     }
 
     return render(request, 'index.html', context)
@@ -70,10 +59,11 @@ def sales(json_data):
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
                     article = Article.objects.get(codeProduit=product["codeProduit"])
-                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity)
+                    promo = 0
+                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prix=article.prix, promo=promo)
                     article_list.save()
                     articles.append(article_list)
-                    sum += (quantity * article.prix)
+                    sum += (quantity * (article.prix - promo))
                 client = ""
                 if "carteFid" in ticket:
                     client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]["carteFid"]
@@ -88,7 +78,7 @@ def sales(json_data):
                         'client_id': client,
                         'card': card
                     }
-                    paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
+                    paiement = api.post_request('gestion-paiement', 'api/proceed-payement', body)
                     response = json.loads(paiement[1].content)
                     if paiement[0] == 200 and response["status"] == "OK":
                         new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
@@ -114,7 +104,7 @@ def get_tickets(request):
         articles_code = []
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
-            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite}
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix, 'promo': current.promo}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)

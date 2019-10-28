@@ -9,6 +9,8 @@ class Article(models.Model):
 class ArticlesList(models.Model):
     codeProduit = models.CharField(max_length=20)
     quantite = models.IntegerField()
+    prix = models.IntegerField()
+    promo = models.IntegerField()
 
 class Ticket(models.Model):
     date = models.DateTimeField()
