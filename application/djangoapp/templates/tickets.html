@@ -15,7 +15,9 @@
             {%  for article in ticket.articles.all %}
                 {
                     codeProduit: {{ article.codeProduit }},
-                    quantité: {{ article.quantite }}
+                    quantité: {{ article.quantite }},
+                    prix: {{ article.prix }} cts,
+                    promo: {{ article.promo }}
                 },
             {% endfor %}
                   ],

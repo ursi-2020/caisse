@@ -6,7 +6,7 @@
       "caisse": "3",
       "panier": [
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-2",
           "description": "Livre:P2-43",
           "quantity": 1
         }
@@ -18,7 +18,7 @@
       "caisse": "1",
       "panier": [
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-3",
           "description": "TV:P2-48",
           "quantity": 1
         },
@@ -28,7 +28,7 @@
           "quantity": 2
         },
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-9",
           "description": "Livre:P2-39",
           "quantity": 1
         }
@@ -39,7 +39,7 @@
       "caisse": "2",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-0",
           "description": "Frigos:P1-18",
           "quantity": 1
         },
@@ -49,7 +49,7 @@
           "quantity": 2
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-2",
           "description": "Console:P2-14",
           "quantity": 2
         }
@@ -63,7 +63,7 @@
       "caisse": "4",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-8",
           "description": "Console:P3-24",
           "quantity": 1
         },
@@ -89,7 +89,7 @@
       "caisse": "2",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-0",
           "description": "Frigos:P1-18",
           "quantity": 1
         },
@@ -99,7 +99,7 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-3",
           "description": "Console:P2-14",
           "quantity": 1
         }
@@ -113,7 +113,7 @@
       "caisse": "2",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-0",
           "description": "Frigos:P1-18",
           "quantity": 2
         },
@@ -123,7 +123,7 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-2",
           "description": "Console:P2-14",
           "quantity": 2
         }
@@ -137,7 +137,7 @@
       "caisse": "2",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-0",
           "description": "Frigos:P1-18",
           "quantity": 3
         },
@@ -147,7 +147,7 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-3",
           "description": "Console:P2-14",
           "quantity": 1
         }
@@ -161,7 +161,7 @@
       "caisse": "2",
       "panier": [
         {
-          "codeProduit": "X1-10",
+          "codeProduit": "X1-0",
           "description": "Frigos:P1-18",
           "quantity": 4
         },
@@ -171,7 +171,7 @@
           "quantity": 2
         },
         {
-          "codeProduit": "X1-1",
+          "codeProduit": "X1-2",
           "description": "Console:P2-14",
           "quantity": 2
         }

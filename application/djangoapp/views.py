@@ -69,9 +69,12 @@ def sales(json_data):
                     client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]["carteFid"]
 
                 mode_paiement = "CASH"
-                if ticket["modePaiement"] == "CARD":
-                    card = ticket["card"]
-                    mode_paiement = "CARD"
+                if ticket["modePaiement"] != "CASH":
+                    card = ""
+                    mode_paiement = ticket["modePaiement"]
+                    if mode_paiement == "CARD":
+                        card = ticket["card"]
+
                     body = {
                         'amount': sum,
                         'payement_method': mode_paiement,
@@ -82,17 +85,41 @@ def sales(json_data):
                     response = json.loads(paiement[1].content)
                     if paiement[0] == 200 and response["status"] == "OK":
                         new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
-                                            modePaiement=mode_paiement)
+                                            modePaiement=mode_paiement, transmis=False)
+                        envoi = send_ticket(new_ticket)
+                        print(envoi)
+                        if envoi == 200:
+                            new_ticket.transmis = True
                         new_ticket.save()
                         new_ticket.articles.set(articles)
                         new_ticket.save()
                 else:
                     new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
-                                        modePaiement=mode_paiement)
+                                        modePaiement=mode_paiement, transmis=False)
+                    envoi = send_ticket(new_ticket)
+                    print(envoi)
+                    if envoi == 200:
+                        new_ticket.transmis = True
                     new_ticket.save()
                     new_ticket.articles.set(articles)
                     new_ticket.save()
 
+def send_ticket(ticket):
+    ticket.id = 0
+    data = json.loads(serializers.serialize('json', [ticket]))
+    json_ticket = data[0]["fields"]
+    articles_code = []
+    for article in json_ticket['articles']:
+        current = ArticlesList.objects.get(id=article)
+        json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix, 'promo': current.promo}
+        articles_code.append(json.loads(json.dumps(json_article)))
+    json_ticket['articles'] = articles_code
+    body = {
+        'ticket': json_ticket
+    }
+
+    response = api.post_request('gestion-magasin', 'api/sales', body)
+    return response
 
 @require_GET
 def get_tickets(request):
@@ -105,6 +132,24 @@ def get_tickets(request):
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
             json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix, 'promo': current.promo}
+            articles_code.append(json.loads(json.dumps(json_article)))
+        ticket['articles'] = articles_code
+        response.append(ticket)
+
+    return JsonResponse(response, safe=False)
+
+@require_GET
+def get_new_tickets(request):
+    tickets = Ticket.objects.filter(transmis=False)
+    data = json.loads(serializers.serialize('json', tickets))
+    response = []
+    for ticket_json in data:
+        ticket = ticket_json["fields"]
+        articles_code = []
+        for article in ticket['articles']:
+            current = ArticlesList.objects.get(id=article)
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix,
+                            'promo': current.promo}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
@@ -155,6 +200,7 @@ def tickets(request):
     tickets = Ticket.objects.all()
     for ticket in tickets:
         ticket.prix = ticket.prix / 100
+
     context = {
         'tickets': tickets
     }

@@ -19,3 +19,4 @@ class Ticket(models.Model):
     articles = models.ManyToManyField(ArticlesList)
     pointsFidelite = models.IntegerField()
     modePaiement = models.CharField(max_length=10)
+    transmis = models.BooleanField()

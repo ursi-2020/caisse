@@ -28,4 +28,10 @@ Permet de consulter la liste des tickets dans la base de données locale.
 
 `/api/tickets`
 
-Permet de récupérer la liste des produits dans la base de données locale sous format JSON.
+Permet de récupérer la liste des tickets dans la base de données locale sous format JSON.
+
+---
+
+`/api/new_tickets`
+
+Permet de récupérer la liste des tickets qui n'ont jamais été transmis au magasin dans la base de données locale sous format JSON.

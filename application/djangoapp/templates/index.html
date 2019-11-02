@@ -43,14 +43,5 @@
     <input type="file" name="file">
     <button  name="order" type="submit">Charger une commande client</button>
   </form>
-    {%  if client != '' %}
-        <p> <b>Client :</b> {{ client.firstName }} {{ client.lastName }}</p>
-    {% endif %}
-    <br>
-    {%  if sum > 0 %}
-        <p><b>Somme des prix de la commande client : </b>{{ sum }}€</p>
-        <p><b>Points de fidélité disponibles :</b>  {{ fidelity_points }}</p>
-        <p><b>Reduction:</b> {{ reduction }}€</p>
-        <p><b> Prix total à payer: </b>{{ final_price }}€</p>
-    {% endif %}
+
 </body>
