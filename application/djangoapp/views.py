@@ -56,6 +56,7 @@ def sales(json_data):
             if "panier" in ticket:
                 sum = 0
                 articles = []
+                time = api.send_request('scheduler', 'clock/time')
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
                     article = Article.objects.get(codeProduit=product["codeProduit"])
@@ -84,7 +85,7 @@ def sales(json_data):
                     paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
                     response = json.loads(paiement[1].content)
                     if paiement[0] == 200 and response["status"] == "OK":
-                        new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
+                        new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                             modePaiement=mode_paiement, transmis=False)
                         envoi = send_ticket(new_ticket)
                         print(envoi)
@@ -94,7 +95,7 @@ def sales(json_data):
                         new_ticket.articles.set(articles)
                         new_ticket.save()
                 else:
-                    new_ticket = Ticket(date=timezone.now(), prix=sum, client=client, pointsFidelite=0,
+                    new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                         modePaiement=mode_paiement, transmis=False)
                     envoi = send_ticket(new_ticket)
                     print(envoi)
@@ -171,7 +172,7 @@ def scheduler(request):
         final_time_str = day[0] + '/' + date[1] + '/' + date[0] + '-' + day[1]
         final_time = datetime.strptime(final_time_str, '%d/%m/%Y-%H:%M:%S')
 
-        schedule_task("caisse", "database_update_scheduled", final_time, "day", "", "caisse", "update_database")
+        schedule_task("caisse", "/database_update_scheduled", final_time, "day", "", "caisse", "Caisse: Update Products")
 
     tasks = ""
     try:
