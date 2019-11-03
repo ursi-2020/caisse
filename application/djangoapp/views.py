@@ -56,7 +56,8 @@ def sales(json_data):
             if "panier" in ticket:
                 sum = 0
                 articles = []
-                time = api.send_request('scheduler', 'clock/time')
+                clock_time = api.send_request('scheduler', 'clock/time').strip('"')
+                time = datetime.strptime(clock_time, '%d/%m/%Y-%H:%M:%S')
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
                     article = Article.objects.get(codeProduit=product["codeProduit"])
@@ -88,7 +89,7 @@ def sales(json_data):
                         new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                             modePaiement=mode_paiement, transmis=False)
                         envoi = send_ticket(new_ticket)
-                        print(envoi)
+
                         if envoi == 200:
                             new_ticket.transmis = True
                         new_ticket.save()
@@ -98,7 +99,7 @@ def sales(json_data):
                     new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                         modePaiement=mode_paiement, transmis=False)
                     envoi = send_ticket(new_ticket)
-                    print(envoi)
+
                     if envoi == 200:
                         new_ticket.transmis = True
                     new_ticket.save()
@@ -107,19 +108,16 @@ def sales(json_data):
 
 def send_ticket(ticket):
     ticket.id = 0
-    data = json.loads(serializers.serialize('json', [ticket]))
-    json_ticket = data[0]["fields"]
-    articles_code = []
-    for article in json_ticket['articles']:
-        current = ArticlesList.objects.get(id=article)
-        json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix, 'promo': current.promo}
-        articles_code.append(json.loads(json.dumps(json_article)))
-    json_ticket['articles'] = articles_code
+    last_ticket = Ticket.objects.last()
+    if last_ticket:
+        ticket.id = last_ticket.id + 1
+    json_ticket = { 'date': ticket.date, 'prix': ticket.prix, 'client': ticket.client, 'pointsFidelites': ticket.pointsFidelite, 'articles': ticket.articles.values(), 'modePaiement': ticket.modePaiement, 'transmis': ticket.transmis }
+
     body = {
         'ticket': json_ticket
     }
 
-    response = api.post_request('gestion-magasin', 'api/sales', body)
+    response = api.post_request('gestion-magasin', 'api/sales/', body)
     return response
 
 @require_GET
@@ -201,6 +199,8 @@ def tickets(request):
     tickets = Ticket.objects.all()
     for ticket in tickets:
         ticket.prix = ticket.prix / 100
+
+    print(tickets)
 
     context = {
         'tickets': tickets
