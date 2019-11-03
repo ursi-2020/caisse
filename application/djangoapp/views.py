@@ -88,33 +88,36 @@ def sales(json_data):
                     if paiement[0] == 200 and response["status"] == "OK":
                         new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                             modePaiement=mode_paiement, transmis=False)
-                        envoi = send_ticket(new_ticket)
-
-                        if envoi == 200:
-                            new_ticket.transmis = True
                         new_ticket.save()
                         new_ticket.articles.set(articles)
+                        envoi = send_ticket(new_ticket)
+                        if envoi == 200:
+                            new_ticket.transmis = True
                         new_ticket.save()
                 else:
                     new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
                                         modePaiement=mode_paiement, transmis=False)
+                    new_ticket.save()
+                    new_ticket.articles.set(articles)
                     envoi = send_ticket(new_ticket)
-
                     if envoi == 200:
                         new_ticket.transmis = True
                     new_ticket.save()
-                    new_ticket.articles.set(articles)
-                    new_ticket.save()
+
 
 def send_ticket(ticket):
-    ticket.id = 0
-    last_ticket = Ticket.objects.last()
-    if last_ticket:
-        ticket.id = last_ticket.id + 1
-    json_ticket = { 'date': ticket.date, 'prix': ticket.prix, 'client': ticket.client, 'pointsFidelites': ticket.pointsFidelite, 'articles': ticket.articles.values(), 'modePaiement': ticket.modePaiement, 'transmis': ticket.transmis }
+    articles_code = []
+    print(ticket.articles.values())
+    json_ticket = { 'date': datetime.strftime(ticket.date, '%d/%m/%Y-%H:%M:%S'), 'prix': ticket.prix, 'client': ticket.client, 'pointsFidelites': ticket.pointsFidelite, 'articles': ticket.articles.values(), 'modePaiement': ticket.modePaiement, 'transmis': ticket.transmis }
+    for article in json_ticket['articles']:
+        current = ArticlesList.objects.get(id=article["id"])
+        json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix,
+                        'promo': current.promo}
+        articles_code.append(json.loads(json.dumps(json_article)))
+    json_ticket['articles'] = json.dumps(articles_code)
 
     body = {
-        'ticket': json_ticket
+        "ticket": json.dumps(json_ticket)
     }
 
     response = api.post_request('gestion-magasin', 'api/sales/', body)
