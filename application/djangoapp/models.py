@@ -2,12 +2,12 @@ from django.db import models
 
 
 class Article(models.Model):
-    codeProduit = models.CharField(max_length=20)
+    codeProduit = models.CharField(max_length=50)
     stock = models.PositiveIntegerField()
     prix = models.IntegerField()
 
 class ArticlesList(models.Model):
-    codeProduit = models.CharField(max_length=20)
+    codeProduit = models.CharField(max_length=50)
     quantite = models.IntegerField()
     prix = models.IntegerField()
     promo = models.IntegerField()
@@ -15,7 +15,7 @@ class ArticlesList(models.Model):
 class Ticket(models.Model):
     date = models.DateTimeField()
     prix = models.IntegerField()
-    client = models.CharField(max_length=20)
+    client = models.CharField(max_length=50)
     articles = models.ManyToManyField(ArticlesList)
     pointsFidelite = models.IntegerField()
     modePaiement = models.CharField(max_length=10)

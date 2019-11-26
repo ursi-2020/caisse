@@ -10,6 +10,7 @@ urlpatterns=[
     path('database_update_scheduled', views.database_update_scheduled, name='database_update_scheduled'),
     path('database/', views.database, name='database'),
     path('tickets/', views.tickets, name='tickets'),
+
     path('api/tickets/', views.get_tickets, name='Get Tickets'),
     path('api/new_tickets/', views.get_new_tickets, name='Get New Tickets')
 ]
