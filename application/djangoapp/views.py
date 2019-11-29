@@ -62,7 +62,8 @@ def sales(json_data):
                     quantity = product["quantity"]
                     article = Article.objects.get(codeProduit=product["codeProduit"])
                     promo = 0
-                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prix=article.prix, promo=promo)
+                    prixApres = article.prix - (article.prix * promo / 100)
+                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix, promo=promo, prixApres=prixApres)
                     article_list.save()
                     articles.append(article_list)
                     sum += (quantity * (article.prix - promo))
@@ -111,8 +112,8 @@ def send_ticket(ticket):
     json_ticket = { 'date': datetime.strftime(ticket.date, '%d/%m/%Y-%H:%M:%S'), 'prix': ticket.prix, 'client': ticket.client, 'pointsFidelites': ticket.pointsFidelite, 'articles': ticket.articles.values(), 'modePaiement': ticket.modePaiement, 'transmis': ticket.transmis }
     for article in json_ticket['articles']:
         current = ArticlesList.objects.get(id=article["id"])
-        json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix,
-                        'promo': current.promo}
+        json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
+                        'prixApres': current.prixApres, 'promo': current.promo}
         articles_code.append(json.loads(json.dumps(json_article)))
     json_ticket['articles'] = json.dumps(articles_code)
 
@@ -133,7 +134,8 @@ def get_tickets(request):
         articles_code = []
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
-            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix, 'promo': current.promo}
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
+                            'prixApres': current.prixApres, 'promo': current.promo}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
@@ -150,8 +152,8 @@ def get_new_tickets(request):
         articles_code = []
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
-            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prix': current.prix,
-                            'promo': current.promo}
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prix,
+                            'prixApres': current.prixApres, 'promo': current.promo}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
