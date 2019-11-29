@@ -6,7 +6,7 @@
       "caisse": "3",
       "panier": [
         {
-          "codeProduit": "X1-2",
+          "codeProduit": "X1-0",
           "description": "Livre:P2-43",
           "quantity": 1
         }
@@ -23,12 +23,12 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-4",
+          "codeProduit": "X1-1",
           "description": "TV:P1-13",
           "quantity": 2
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-10",
           "description": "Livre:P2-39",
           "quantity": 1
         }
@@ -44,17 +44,17 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-10",
           "description": "Console:P2-46",
           "quantity": 2
         },
         {
-          "codeProduit": "X1-2",
+          "codeProduit": "X1-8",
           "description": "Console:P2-14",
           "quantity": 2
         }
       ],
-      "carteFid": "09b637ac-f9c7-11e9-a6c9-08002751d198",
+      "carteFid": "259a3a6c-1296-11ea-b6f4-08002751d198",
       "modePaiement": "CARD",
       "card": "BKN1CST17"
 
@@ -68,12 +68,12 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-10",
           "description": "DVD:P2-34",
           "quantity": 1
         },
         {
-          "codeProduit": "X1-4",
+          "codeProduit": "X1-3",
           "description": "Console:P2-27",
           "quantity": 1
         },
@@ -94,7 +94,7 @@
           "quantity": 1
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-1",
           "description": "Console:P2-46",
           "quantity": 1
         },
@@ -104,7 +104,7 @@
           "quantity": 1
         }
       ],
-      "carteFid": "09b637ac-f9c7-11e9-a6c9-08002751d198",
+      "carteFid": "259ab73a-1296-11ea-b6f4-08002751d198",
       "modePaiement": "CARD",
       "card": "BKN1CST17"
 
@@ -118,17 +118,17 @@
           "quantity": 2
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-1",
           "description": "Console:P2-46",
           "quantity": 1
         },
         {
-          "codeProduit": "X1-2",
+          "codeProduit": "X1-8",
           "description": "Console:P2-14",
           "quantity": 2
         }
       ],
-      "carteFid": "09b637ac-f9c7-11e9-a6c9-08002751d198",
+      "carteFid": "259b09ba-1296-11ea-b6f4-08002751d198",
       "modePaiement": "CARD",
       "card": "BKN1CST17"
 
@@ -142,7 +142,7 @@
           "quantity": 3
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-10",
           "description": "Console:P2-46",
           "quantity": 1
         },
@@ -152,7 +152,7 @@
           "quantity": 1
         }
       ],
-      "carteFid": "09b637ac-f9c7-11e9-a6c9-08002751d198",
+      "carteFid": "259ab73a-1296-11ea-b6f4-08002751d198",
       "modePaiement": "CARD",
       "card": "BKN1CST17"
 
@@ -166,17 +166,17 @@
           "quantity": 4
         },
         {
-          "codeProduit": "X1-9",
+          "codeProduit": "X1-10",
           "description": "Console:P2-46",
           "quantity": 2
         },
         {
-          "codeProduit": "X1-2",
+          "codeProduit": "X1-8",
           "description": "Console:P2-14",
           "quantity": 2
         }
       ],
-      "carteFid": "09b637ac-f9c7-11e9-a6c9-08002751d198",
+      "carteFid": "259a3a6c-1296-11ea-b6f4-08002751d198",
       "modePaiement": "CARD",
       "card": "BKN1CST17"
 
