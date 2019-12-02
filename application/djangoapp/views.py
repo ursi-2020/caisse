@@ -32,6 +32,8 @@ def products_update(request):
             Ticket.objects.all().delete()
         elif 'scheduler' in request.POST:
             return scheduler(request)
+        elif 'simulator' in request.POST:
+            sales_simulation(request)
         elif 'order' in request.POST and request.FILES and request.FILES['file']:
             try:
                 json_data = json.loads(request.FILES['file'].read())
@@ -48,7 +50,6 @@ def products_update(request):
     }
 
     return render(request, 'index.html', context)
-
 
 def sales(json_data):
     if "tickets" in json_data:
@@ -69,7 +70,10 @@ def sales(json_data):
                     sum += (quantity * (article.prix - promo))
                 client = ""
                 if "carteFid" in ticket:
-                    client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]["idClient"]
+                    try:
+                        client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]["idClient"]
+                    except:
+                        client = ticket["carteFid"]
 
                 mode_paiement = "CASH"
                 if ticket["modePaiement"] != "CASH":
@@ -105,6 +109,11 @@ def sales(json_data):
                         new_ticket.transmis = True
                     new_ticket.save()
 
+@csrf_exempt
+def sales_simulation(request):
+    print("OUI")
+    print(request.POST)
+    return HttpResponse("ok")
 
 def send_ticket(ticket):
     articles_code = []
@@ -152,7 +161,7 @@ def get_new_tickets(request):
         articles_code = []
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
-            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prix,
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
                             'prixApres': current.prixApres, 'promo': current.promo}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code

@@ -11,6 +11,9 @@ urlpatterns=[
     path('database/', views.database, name='database'),
     path('tickets/', views.tickets, name='tickets'),
 
+    path('sales_simulation', views.sales_simulation, name='Sales Simulation'),
+
     path('api/tickets/', views.get_tickets, name='Get Tickets'),
     path('api/new_tickets/', views.get_new_tickets, name='Get New Tickets')
+
 ]
