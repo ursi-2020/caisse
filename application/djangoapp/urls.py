@@ -14,6 +14,7 @@ urlpatterns=[
     path('sales_simulation', views.sales_simulation, name='Sales Simulation'),
 
     path('api/tickets/', views.get_tickets, name='Get Tickets'),
-    path('api/new_tickets/', views.get_new_tickets, name='Get New Tickets')
+    path('api/new_tickets/', views.get_new_tickets, name='Get New Tickets'),
+    path('api/new_tickets/demo', views.get_new_tickets_demo, name='Get New Tickets')
 
 ]

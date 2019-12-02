@@ -48,5 +48,10 @@
     {% csrf_token %}
     <button  name="simulator" type="submit">Lancer le simulateur de Ventes</button>
   </form>
+  <br>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button  name="new_tickets" type="submit">Accéder à la liste des tickets non-transmis</button>
+  </form>
 
 </body>

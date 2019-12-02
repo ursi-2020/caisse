@@ -34,6 +34,8 @@ def products_update(request):
             return scheduler(request)
         elif 'simulator' in request.POST:
             sales_simulation(request)
+        elif 'new_tickets' in request.POST:
+            get_new_tickets_demo(request)
         elif 'order' in request.POST and request.FILES and request.FILES['file']:
             try:
                 json_data = json.loads(request.FILES['file'].read())
@@ -109,10 +111,71 @@ def sales(json_data):
                         new_ticket.transmis = True
                     new_ticket.save()
 
+def sale(ticket):
+    print(ticket)
+    if "panier" in ticket:
+        sum = 0
+        articles = []
+        clock_time = api.send_request('scheduler', 'clock/time').strip('"')
+        time = datetime.strptime(clock_time, '%d/%m/%Y-%H:%M:%S')
+        for product in ticket["panier"]:
+            if product["codeProduit"][0] == 'X':
+                quantity = product["quantity"]
+                article = Article.objects.get(codeProduit=product["codeProduit"])
+                promo = 0
+                prixApres = article.prix - (article.prix * promo / 100)
+                article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
+                                            promo=promo, prixApres=prixApres)
+                article_list.save()
+                articles.append(article_list)
+                sum += (quantity * (article.prix - promo))
+        client = ""
+        if "carteFid" in ticket:
+            try:
+                client = \
+                json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0][
+                    "idClient"]
+            except:
+                client = ticket["carteFid"]
+
+        mode_paiement = "CASH"
+        if ticket["modePaiement"] != "CASH":
+            card = ""
+            mode_paiement = ticket["modePaiement"]
+            if mode_paiement == "CARD":
+                card = ticket["card"]
+
+            body = {
+                'amount': sum,
+                'payement_method': mode_paiement,
+                'client_id': client,
+                'card': card
+            }
+            paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
+            response = json.loads(paiement[1].content)
+            if paiement[0] == 200 and response["status"] == "OK":
+                new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
+                                    modePaiement=mode_paiement, transmis=False)
+                new_ticket.save()
+                new_ticket.articles.set(articles)
+                envoi = send_ticket(new_ticket)
+                if envoi == 200:
+                    new_ticket.transmis = True
+                new_ticket.save()
+        else:
+            new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
+                                modePaiement=mode_paiement, transmis=False)
+            new_ticket.save()
+            new_ticket.articles.set(articles)
+            envoi = send_ticket(new_ticket)
+            if envoi == 200:
+                new_ticket.transmis = True
+            new_ticket.save()
+
 @csrf_exempt
 def sales_simulation(request):
     print("OUI")
-    print(request.POST)
+    sale(json.loads(request.body))
     return HttpResponse("ok")
 
 def send_ticket(ticket):
@@ -170,6 +233,31 @@ def get_new_tickets(request):
         ticket.transmis = True
         ticket.save()
     return JsonResponse(response, safe=False)
+
+
+def get_new_tickets_demo(request):
+    tickets = Ticket.objects.filter(transmis=False)
+    data = json.loads(serializers.serialize('json', tickets))
+    response = []
+    for ticket_json in data:
+        ticket = ticket_json["fields"]
+        articles_code = []
+        for article in ticket['articles']:
+            current = ArticlesList.objects.get(id=article)
+            json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
+                            'prixApres': current.prixApres, 'promo': current.promo}
+            articles_code.append(json.loads(json.dumps(json_article)))
+        ticket['articles'] = articles_code
+        response.append(ticket)
+
+    context = {
+        'tickets': tickets
+    }
+
+    print(tickets)
+
+    return render(request, 'tickets.html', context)
+
 
 def scheduler(request):
 
