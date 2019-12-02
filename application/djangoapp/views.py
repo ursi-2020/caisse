@@ -166,7 +166,9 @@ def get_new_tickets(request):
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
-
+    for ticket in tickets:
+        ticket.transmis = True
+        ticket.save()
     return JsonResponse(response, safe=False)
 
 def scheduler(request):
