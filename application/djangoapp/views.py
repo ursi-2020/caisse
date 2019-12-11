@@ -112,23 +112,21 @@ def sales(json_data):
                     new_ticket.save()
 
 def sale(ticket):
-    print(ticket)
     if "panier" in ticket:
         sum = 0
         articles = []
         clock_time = api.send_request('scheduler', 'clock/time').strip('"')
         time = datetime.strptime(clock_time, '%d/%m/%Y-%H:%M:%S')
         for product in ticket["panier"]:
-            if product["codeProduit"][0] == 'X':
-                quantity = product["quantity"]
-                article = Article.objects.get(codeProduit=product["codeProduit"])
-                promo = 0
-                prixApres = article.prix - (article.prix * promo / 100)
-                article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
+            quantity = product["quantity"]
+            article = Article.objects.get(codeProduit=product["codeProduit"])
+            promo = 0
+            prixApres = article.prix - (article.prix * promo / 100)
+            article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
                                             promo=promo, prixApres=prixApres)
-                article_list.save()
-                articles.append(article_list)
-                sum += (quantity * (article.prix - promo))
+            article_list.save()
+            articles.append(article_list)
+            sum += (quantity * (article.prix - promo))
         client = ""
         if "carteFid" in ticket:
             try:
