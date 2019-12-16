@@ -64,13 +64,20 @@ def sales(json_data):
                 for product in ticket["panier"]:
                     quantity = product["quantity"]
                     article = Article.objects.get(codeProduit=product["codeProduit"])
-                    promo = 0
+                    promoProduit = article.promo
+                    promoPanier = 0
+                    promoProduitClient = 0
+                    promo = promoProduit + promoPanier + promoProduitClient
                     prixApres = article.prix - (article.prix * promo / 100)
-                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix, promo=promo, prixApres=prixApres)
+                    article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity,
+                                                prixAvant=article.prix,
+                                                promoProduit=promoProduit, promoPanier=promoPanier,
+                                                promoProduitClient=promoProduitClient, prixApres=prixApres)
                     article_list.save()
                     articles.append(article_list)
                     sum += (quantity * (article.prix - promo))
                 client = ""
+
                 if "carteFid" in ticket:
                     try:
                         client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]["idClient"]
@@ -117,24 +124,32 @@ def sale(ticket):
         articles = []
         clock_time = api.send_request('scheduler', 'clock/time').strip('"')
         time = datetime.strptime(clock_time, '%d/%m/%Y-%H:%M:%S')
-        for product in ticket["panier"]:
-            quantity = product["quantity"]
-            article = Article.objects.get(codeProduit=product["codeProduit"])
-            promo = 0
-            prixApres = article.prix - (article.prix * promo / 100)
-            article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
-                                            promo=promo, prixApres=prixApres)
-            article_list.save()
-            articles.append(article_list)
-            sum += (quantity * (article.prix - promo))
+
         client = ""
+
         if "carteFid" in ticket:
+
             try:
-                client = \
-                json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0][
+                client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0][
                     "idClient"]
             except:
                 client = ticket["carteFid"]
+
+        for product in ticket["panier"]:
+            quantity = product["quantity"]
+            article = Article.objects.get(codeProduit=product["codeProduit"])
+            promoProduit = article.promo
+            promoPanier = 0
+            promoProduitClient = 0
+            promo = promoProduit + promoPanier + promoProduitClient
+            prixApres = article.prix - (article.prix * promo / 100)
+            article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
+                                            promoProduit=promoProduit, promoPanier=promoPanier,
+                                            promoProduitClient=promoProduitClient, prixApres=prixApres)
+            article_list.save()
+            articles.append(article_list)
+            sum += (quantity * (article.prix - promo))
+
 
         mode_paiement = "CASH"
         if ticket["modePaiement"] != "CASH":
@@ -149,6 +164,7 @@ def sale(ticket):
                 'client_id': client,
                 'card': card
             }
+
             paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
             response = json.loads(paiement[1].content)
             if paiement[0] == 200 and response["status"] == "OK":
@@ -172,18 +188,17 @@ def sale(ticket):
 
 @csrf_exempt
 def sales_simulation(request):
-    print("OUI")
     sale(json.loads(request.body))
     return HttpResponse("ok")
 
 def send_ticket(ticket):
     articles_code = []
-    print(ticket.articles.values())
     json_ticket = { 'date': datetime.strftime(ticket.date, '%d/%m/%Y-%H:%M:%S'), 'prix': ticket.prix, 'client': ticket.client, 'pointsFidelites': ticket.pointsFidelite, 'articles': ticket.articles.values(), 'modePaiement': ticket.modePaiement, 'transmis': ticket.transmis }
     for article in json_ticket['articles']:
         current = ArticlesList.objects.get(id=article["id"])
         json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
-                        'prixApres': current.prixApres, 'promo': current.promo}
+                        'prixApres': current.prixApres, 'promoProduit': current.promoProduit,
+                        'promoPanier': current.promoPanier, 'promoProduitClient': current.promoProduitClient}
         articles_code.append(json.loads(json.dumps(json_article)))
     json_ticket['articles'] = json.dumps(articles_code)
 
@@ -205,7 +220,8 @@ def get_tickets(request):
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
             json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
-                            'prixApres': current.prixApres, 'promo': current.promo}
+                            'prixApres': current.prixApres, 'promoProduit': current.promoProduit,
+                            'promoPanier': current.promoPanier, 'promoProduitClient': current.promoProduitClient}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
@@ -223,7 +239,8 @@ def get_new_tickets(request):
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
             json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
-                            'prixApres': current.prixApres, 'promo': current.promo}
+                            'prixApres': current.prixApres, 'promoProduit': current.promoProduit,
+                            'promoPanier': current.promoPanier, 'promoProduitClient': current.promoProduitClient}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
@@ -243,7 +260,8 @@ def get_new_tickets_demo(request):
         for article in ticket['articles']:
             current = ArticlesList.objects.get(id=article)
             json_article = {'codeProduit': current.codeProduit, 'quantity': current.quantite, 'prixAvant': current.prixAvant,
-                            'prixApres': current.prixApres, 'promo': current.promo}
+                            'prixApres': current.prixApres, 'promoProduit': current.promoProduit,
+                            'promoPanier': current.promoPanier, 'promoProduitClient': current.promoProduitClient}
             articles_code.append(json.loads(json.dumps(json_article)))
         ticket['articles'] = articles_code
         response.append(ticket)
@@ -251,8 +269,6 @@ def get_new_tickets_demo(request):
     context = {
         'tickets': tickets
     }
-
-    print(tickets)
 
     return render(request, 'tickets.html', context)
 
@@ -302,8 +318,6 @@ def tickets(request):
     for ticket in tickets:
         ticket.prix = ticket.prix / 100
 
-    print(tickets)
-
     context = {
         'tickets': tickets
     }
@@ -326,7 +340,7 @@ def database_update():
 
     try:
         for product in json_data:
-            article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"])
+            article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"], promo=product["promo"])
             article.save()
     except Exception as e:
         return HttpResponse("Error in the load of the items" + str(e))
@@ -347,7 +361,7 @@ def database_update_scheduled(request):
         return HttpResponse("Error in database update scheduled : " + str(e))
 
     for product in json_data:
-        article = Article(codeProduit=product["codeProduit"], prix=product["prix"] / 100, stock=product["quantiteMin"])
+        article = Article(codeProduit=product["codeProduit"], prix=product["prix"] / 100, stock=product["quantiteMin"], promo=product["promo"])
         article.save()
 
     return HttpResponse("Success")

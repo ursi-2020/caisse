@@ -5,13 +5,16 @@ class Article(models.Model):
     codeProduit = models.CharField(max_length=50)
     stock = models.PositiveIntegerField()
     prix = models.IntegerField()
+    promo = models.IntegerField()
 
 class ArticlesList(models.Model):
     codeProduit = models.CharField(max_length=50)
     quantite = models.IntegerField()
     prixAvant = models.IntegerField()
     prixApres = models.IntegerField()
-    promo = models.IntegerField()
+    promoProduit = models.IntegerField()
+    promoPanier = models.IntegerField()
+    promoProduitClient = models.IntegerField()
 
 class Ticket(models.Model):
     date = models.DateTimeField()
