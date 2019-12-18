@@ -126,21 +126,32 @@ def sale(ticket):
         time = datetime.strptime(clock_time, '%d/%m/%Y-%H:%M:%S')
 
         client = ""
+        client_id = ""
 
         if "carteFid" in ticket:
 
             try:
-                client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0][
-                    "idClient"]
+                client = json.loads(api.send_request('gestion-magasin', 'api/customers/?carteFid=' + ticket["carteFid"]))[0]
+                client_id = client["idClient"]
             except:
-                client = ticket["carteFid"]
+                client_id = ticket["carteFid"]
 
         for product in ticket["panier"]:
             quantity = product["quantity"]
-            article = Article.objects.get(codeProduit=product["codeProduit"])
+            article = ""
+            try:
+                article = Article.objects.get(codeProduit=product["codeProduit"])
+            except:
+                print("Product doesn't exist: ")
+                print(product["codeProduit"])
+                break
             promoProduit = article.promo
             promoPanier = 0
+            if client != "" and "promo" in client:
+                promoPanier = client["promo"]
+
             promoProduitClient = 0
+
             promo = promoProduit + promoPanier + promoProduitClient
             prixApres = article.prix - (article.prix * promo / 100)
             article_list = ArticlesList(codeProduit=article.codeProduit, quantite=quantity, prixAvant=article.prix,
@@ -149,7 +160,6 @@ def sale(ticket):
             article_list.save()
             articles.append(article_list)
             sum += (quantity * (article.prix - promo))
-
 
         mode_paiement = "CASH"
         if ticket["modePaiement"] != "CASH":
@@ -161,14 +171,14 @@ def sale(ticket):
             body = {
                 'amount': sum,
                 'payement_method': mode_paiement,
-                'client_id': client,
+                'client_id': client_id,
                 'card': card
             }
 
             paiement = api.post_request2('gestion-paiement', 'api/proceed-payement', body)
             response = json.loads(paiement[1].content)
             if paiement[0] == 200 and response["status"] == "OK":
-                new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
+                new_ticket = Ticket(date=time, prix=sum, client=client_id, pointsFidelite=0,
                                     modePaiement=mode_paiement, transmis=False)
                 new_ticket.save()
                 new_ticket.articles.set(articles)
@@ -177,7 +187,7 @@ def sale(ticket):
                     new_ticket.transmis = True
                 new_ticket.save()
         else:
-            new_ticket = Ticket(date=time, prix=sum, client=client, pointsFidelite=0,
+            new_ticket = Ticket(date=time, prix=sum, client=client_id, pointsFidelite=0,
                                 modePaiement=mode_paiement, transmis=False)
             new_ticket.save()
             new_ticket.articles.set(articles)
