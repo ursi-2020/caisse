@@ -147,6 +147,10 @@ def sale(ticket):
                 break
             promoProduit = article.promo
             promoPanier = 0
+            try:
+               promoPanier = json.loads(api.send_request('gestion-magasin', 'api/promo/customersProducts?'))["promo"]
+            except:
+                print("Error during api/promo/customersProducts")
             if client != "" and "promo" in client:
                 promoPanier = client["promo"]
 
@@ -336,7 +340,6 @@ def tickets(request):
 
 @csrf_exempt
 def database_update():
-    Article.objects.all().delete()
     data = ""
     try:
         data = api.send_request("gestion-magasin", "api/products")
@@ -347,6 +350,9 @@ def database_update():
         json_data = json.loads(data)
     except Exception as e:
         return HttpResponse("Error in database update" + str(e))
+
+    if json_data:
+        Article.objects.all().delete()
 
     try:
         for product in json_data:
@@ -357,8 +363,6 @@ def database_update():
 
 @csrf_exempt
 def database_update_scheduled(request):
-    Article.objects.all().delete()
-
     data = ""
     try:
         data = api.send_request("gestion-magasin", "api/products")
@@ -370,8 +374,11 @@ def database_update_scheduled(request):
     except Exception as e:
         return HttpResponse("Error in database update scheduled : " + str(e))
 
+    if json_data:
+        Article.objects.all().delete()
+
     for product in json_data:
-        article = Article(codeProduit=product["codeProduit"], prix=product["prix"] / 100, stock=product["quantiteMin"], promo=product["promo"])
+        article = Article(codeProduit=product["codeProduit"], prix=product["prix"], stock=product["quantiteMin"], promo=product["promo"])
         article.save()
 
     return HttpResponse("Success")
