@@ -147,10 +147,13 @@ def sale(ticket):
                 break
             promoProduit = article.promo
             promoPanier = 0
+
             try:
-               promoPanier = json.loads(api.send_request('gestion-magasin', 'api/promo/customersProducts?'))["promo"]
+               promoPanier = json.loads(api.send_request('gestion-magasin', 'api/promo/customersProducts?idClient='
+                                                         + client_id + '&codeProduit=' + article.codeProduit))["promo"]
             except:
                 print("Error during api/promo/customersProducts")
+
             if client != "" and "promo" in client:
                 promoPanier = client["promo"]
 
